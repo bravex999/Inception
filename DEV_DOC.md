@@ -1,64 +1,83 @@
-# DEV_DOC
+# Developer Notes — Inception
 
-## Set up the environment from scratch
-### Prerequisites
-- Virtual Machine (as required by the subject)
-- Docker + Docker Compose
-- `make`
+## Prerequisites
 
-### Configuration files / secrets
-- Copy `.env`:
-  ```sh
-  cp srcs/.env.example srcs/.env
-  ```
-  Fill it with real values.
-- If you use secrets: store them locally (gitignored) and mount them as files in containers.
-- Ensure persistent storage exists under `/home/chnaranj/data` on the host (named volumes target this location).
-- Configure DNS/hosts so `chnaranj.42.fr` resolves to your local VM IP.
+- Debian/Ubuntu VM with desktop environment and browser
+- Docker Engine and Docker Compose v2 (`docker compose version` returns v2.x.x)
+- User added to `docker` group (`docker ps` works without sudo)
+- `/etc/hosts` entry: `127.0.0.1 chnaranj.42.fr`
+- Directories created: `/home/chnaranj/data/mariadb` and `/home/chnaranj/data/wordpress`
 
-## Build and launch
-From the repository root:
-```sh
+## Setup from Scratch
+
+```bash
+git clone <repo-url> inception
+cd inception
+cp srcs/.env.example srcs/.env
+nano srcs/.env                  # fill all 'change_me' values
+mkdir -p /home/chnaranj/data/mariadb /home/chnaranj/data/wordpress
 make
 ```
 
-Stop:
-```sh
-make down
+## Project Structure
+
+```
+inception/
+├── Makefile
+├── README.md
+├── USER_DOC.md
+├── DEV_DOC.md
+├── secrets/
+└── srcs/
+    ├── .env
+    ├── .env.example
+    ├── docker-compose.yml
+    └── requirements/
+        ├── mariadb/    (Dockerfile, conf/, tools/)
+        ├── wordpress/  (Dockerfile, tools/)
+        └── nginx/      (Dockerfile, conf/, tools/)
 ```
 
-Full clean:
-```sh
-make clean
+## Container Management
+
+```bash
+docker compose -f srcs/docker-compose.yml -p inception ps
+docker compose -f srcs/docker-compose.yml -p inception logs -f <service>
+docker exec -it inception-<service>-1 sh
 ```
 
-## Architecture
-Three containers orchestrated by Docker Compose on a custom bridge network:
-- **nginx**: terminates TLS and forwards PHP requests to WordPress via FastCGI
-- **wordpress**: php-fpm + WordPress bootstrap (often via WP-CLI)
-- **mariadb**: database init and provisioning
+## Data Storage
 
-Only nginx exposes port 443 to the host. WordPress/MariaDB are reachable only on the internal network by service name.
+Named volumes use `driver_opts` with `device` pointing to host directories:
 
-## Data storage and persistence
-- Persistent data is stored in Docker named volumes.
-- On the host, volume data is located under `/home/chnaranj/data`.
+- `inception_mariadb_data` → `/home/chnaranj/data/mariadb`
+- `inception_wordpress_data` → `/home/chnaranj/data/wordpress`
 
-## Manage containers and volumes
-Status / logs:
-```sh
-docker compose -f srcs/docker-compose.yml ps
-docker compose -f srcs/docker-compose.yml logs -f --tail=200
+```bash
+docker volume ls | grep inception
+docker volume inspect inception_mariadb_data    # check Options.device
+docker volume inspect inception_wordpress_data  # check Options.device
+ls /home/chnaranj/data/mariadb/                 # MariaDB files on host
+ls /home/chnaranj/data/wordpress/               # WordPress files on host
 ```
 
-Volumes:
-```sh
-docker volume ls
-docker volume inspect <volume_name>
-```
+- `make down` preserves volumes (data survives).
+- `make clean` removes containers and images but preserves volumes.
+- Volumes must be removed manually with `docker volume rm` if needed.
 
-## Debug checklist
-- NGINX: `ssl_protocols` allows only TLSv1.2/TLSv1.3; container runs in foreground (no infinite loops).
-- WordPress: php-fpm only (no nginx inside), waits for DB readiness, bootstrap is idempotent.
-- MariaDB: initializes datadir once, provisions DB/users, then runs normally.
-- `.env`/secrets: no passwords committed in the repository.
+## Debug
+
+```bash
+# MariaDB connectivity
+docker exec inception-mariadb-1 mariadb -uwpuser -p'<pwd>' wordpress -e 'SHOW TABLES;'
+
+# php-fpm listening
+docker exec inception-wordpress-1 ss -lntp | grep 9000
+
+# TLS verification
+openssl s_client -connect chnaranj.42.fr:443 -tls1_2
+openssl s_client -connect chnaranj.42.fr:443 -tls1_3
+
+# HTTP must be refused
+curl http://chnaranj.42.fr
+```
