@@ -1,4 +1,11 @@
+
 # Inception (42)
+=======
+This project has been created as part of the 42 curriculum by chnaranj.
+Description
+Inception is a system administration project that deploys a small web infrastructure using Docker. Three services — NGINX, WordPress with php-fpm, and MariaDB — run in isolated containers, orchestrated by Docker Compose. The stack is accessible only via HTTPS (port 443) with TLSv1.2/1.3, and data persists through named volumes stored under /home/chnaranj/data.
+Instructions
+
 
 This project has been created as part of the 42 curriculum by **chnaranj**.
 
