@@ -32,7 +32,17 @@ services:
 
 volumes:
   mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/chnaranj/data/mariadb
   wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/chnaranj/data/wordpress
 
 networks:
   inception:
