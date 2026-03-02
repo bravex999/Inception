@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: mariadb
+    image: mariadb:inception
     build: requirements/mariadb
     env_file: .env
     restart: always
@@ -9,7 +9,7 @@ services:
       - mariadb_data:/var/lib/mysql
 
   wordpress:
-    image: wordpress
+    image: wordpress:inception
     build: requirements/wordpress
     env_file: .env
     restart: always
@@ -19,7 +19,7 @@ services:
       - wordpress_data:/var/www/html
 
   nginx:
-    image: nginx
+    image: nginx:inception
     build: requirements/nginx
     env_file: .env
     restart: always
