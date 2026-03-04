@@ -7,7 +7,7 @@ Inception is a system administration project that deploys a small web infrastruc
 ## Instructions
 
 1. Clone the repository and enter the directory
-2. Copy `srcs/.env.example` to `srcs/.env` and fill in real credentials
+2. Copy 'the file .env' to `srcs/.env` and fill in real credentials
 3. Create data directories: `mkdir -p /home/chnaranj/data/mariadb /home/chnaranj/data/wordpress`
 4. Run `make`
 5. Open `https://chnaranj.42.fr` in the browser (accept the self-signed certificate warning)
