@@ -69,7 +69,7 @@ ls /home/chnaranj/data/wordpress/               # WordPress files on host
 
 ```bash
 # MariaDB connectivity
-docker exec -it inception-mariadb-1 mariadb -u wpuser -p;'
+docker exec -it inception-mariadb-1 mariadb -u wpuser -p
 
 # php-fpm listening
 docker exec inception-wordpress-1 ss -lntp | grep 9000
