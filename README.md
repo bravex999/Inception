@@ -50,4 +50,4 @@ The AI  was used as a learning and productivity tool throughout this project:
 - **Debugging:** initialization failures.
 
 
-All generated content was reviewed, tested manually, and adapted to pass evaluation. No code was used without understanding its purpose.
+All generated content was reviewed, tested manually,No code was used without understanding its purpose.
