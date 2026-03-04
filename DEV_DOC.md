@@ -13,7 +13,7 @@
 ```bash
 git clone <repo-url> inception
 cd inception
-cp srcs/.env.example srcs/.env
+cp .env from out to srcs/.env
 nano srcs/.env                  # fill all 'change_me' values
 mkdir -p /home/chnaranj/data/mariadb /home/chnaranj/data/wordpress
 make
