@@ -11,7 +11,7 @@ Only HTTPS (port 443) is exposed to the host.
 ## Start / stop
 From the repository root:
 ```sh
-cp srcs/.env.example srcs/.env
+cp .env(host) to srcs/.env
 # edit srcs/.env with real credentials
 make
 ```
@@ -40,10 +40,10 @@ Log in with the WordPress administrator credentials configured in your `.env` (o
 
 ## Where credentials are located (and how to manage them)
 - Main configuration is stored in: `srcs/.env` (must not be committed).
-- If you use Docker secrets, they should be stored locally (and ignored by git), then mounted into containers as files.
+
 
 To rotate credentials:
-1) update `.env` (and/or secret files),
+1) update `.env`
 2) restart the stack (`make down` then `make`).
 
 ## Check that everything is running
